@@ -25,9 +25,13 @@ async function productSeeder(prisma: PrismaClient) {
   // Step 2: Process each row
   for (const row of rows) {
     const { name, status, price, stock, availableAt, images } = row;
-    const imageNames = images.split(',').map((img: string) => {
-      // now img is typed
-    });
+
+    if (!images) {
+      console.warn(`⚠️ No images found for product "${name}". Skipping.`);
+      continue;
+    }
+
+    const imageNames = images.split(',').map((img: string) => img.trim());
 
     // Create Product
     const product = await prisma.product.create({
@@ -36,8 +40,8 @@ async function productSeeder(prisma: PrismaClient) {
         status: status as Status,
         price: parseFloat(price),
         stock: parseInt(stock, 10),
-        availableAt: new Date(availableAt)
-      }
+        availableAt: new Date(availableAt),
+      },
     });
 
     for (const imageName of imageNames) {
@@ -54,15 +58,15 @@ async function productSeeder(prisma: PrismaClient) {
         data: {
           name: imageName,
           data: imageBuffer,
-          folder: 'productImages'
-        }
+          folder: 'productImages',
+        },
       });
 
       await prisma.productImage.create({
         data: {
           productId: product.id,
-          imageId: imageRecord.id
-        }
+          imageId: imageRecord.id,
+        },
       });
 
       console.log(`✅ Linked image "${imageName}" to product "${name}"`);
