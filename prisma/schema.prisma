@@ -1,11 +1,19 @@
 generator client {
   provider = "prisma-client-js"
-  // output removed - uses default: node_modules/@prisma/client
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  name     String?
+  username String  @unique
+  password String
 }
 
 enum Status {
@@ -14,35 +22,55 @@ enum Status {
   archived
 }
 
-model Product {
-  id          Int      @id @default(autoincrement())
-  image       Bytes    // equivalent to the bytea in Drizzle
-  name        String
-  status      Status
-  price       Decimal  @db.Decimal(10, 2)
-  stock       Int
-  availableAt DateTime
+model Image {
+  id            Int            @id @default(autoincrement())
+  name          String
+  data          Bytes
+  folder        String // e.g., 'productImages', 'blogImages'
+  uploadedAt    DateTime       @default(now())
+  productImages ProductImage[] // Multiple ProductImage references
+  blogImages    BlogImage[] // Multiple BlogImage references
+  Blog          Blog[]
 }
 
-model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  name     String?
-  username String  @unique
-  password String
-  blogs    Blog[]  // This creates a one-to-many relationship with Blog
+model ProductImage {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  imageId   Int
+  image     Image    @relation(fields: [imageId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now()) // When the image was added to the product
+}
+
+model BlogImage {
+  id        Int      @id @default(autoincrement())
+  blogId    Int
+  imageId   Int
+  image     Image    @relation(fields: [imageId], references: [id])
+  blog      Blog     @relation(fields: [blogId], references: [id])
+  createdAt DateTime @default(now()) // When the image was added to the blog
+}
+
+model Product {
+  id          Int            @id @default(autoincrement())
+  name        String
+  status      Status
+  price       Decimal        @db.Decimal(10, 2)
+  stock       Int
+  availableAt DateTime
+  images      ProductImage[] // One-to-many relation to ProductImage
 }
 
 model Blog {
-  id          Int      @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   title       String
   content     String
-  status      Status  @default(active)  // Default status is active
-  publishedAt DateTime @default(now())  // Default to the current date/time
-  authorId    Int     // Foreign key referencing the User model
-  author      User    @relation(fields: [authorId], references: [id])  // Relationship to User
-
-  image       Bytes?  // Store the image as binary data
-  createdAt   DateTime @default(now())  // Automatically sets the creation date
-  updatedAt   DateTime @updatedAt     // Automatically updates this field when a record is updated
+  status      Status      @default(active)
+  publishedAt DateTime    @default(now())
+  imageId     Int         @unique // Primary image for the blog
+  image       Image       @relation(fields: [imageId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  blogImages  BlogImage[] // One-to-many relation to BlogImage
 }
+
