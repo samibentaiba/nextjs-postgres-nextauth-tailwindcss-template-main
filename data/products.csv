@@ -1,0 +1,3 @@
+name,status,price,stock,availableAt,image
+"Solar Panel A","active",199.99,10,"2025-04-19T00:00:00Z","solar-panel-a.jpg"
+"Inverter B","inactive",299.99,5,"2025-04-19T00:00:00Z","inverter-b.jpg"

@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+  // output removed - uses default: node_modules/@prisma/client
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Status {
+  active
+  inactive
+  archived
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  image       Bytes    // equivalent to the bytea in Drizzle
+  name        String
+  status      Status
+  price       Decimal  @db.Decimal(10, 2)
+  stock       Int
+  availableAt DateTime
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  name     String?
+  username String  @unique
+  password String
+  blogs    Blog[]  // This creates a one-to-many relationship with Blog
+}
+
+model Blog {
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String
+  status      Status  @default(active)  // Default status is active
+  publishedAt DateTime @default(now())  // Default to the current date/time
+  authorId    Int     // Foreign key referencing the User model
+  author      User    @relation(fields: [authorId], references: [id])  // Relationship to User
+
+  image       Bytes?  // Store the image as binary data
+  createdAt   DateTime @default(now())  // Automatically sets the creation date
+  updatedAt   DateTime @updatedAt     // Automatically updates this field when a record is updated
+}
