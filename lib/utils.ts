@@ -31,39 +31,45 @@ export const verifyPassword = async (password: string, hashedPassword: string): 
   return isMatch;
 };
 
-
-// Function to seed data from CSV
 export const seedFromCsv = async (
   prisma: PrismaClient,
-  model: any, // Prisma model e.g., prisma.blog, prisma.product
-  csvFilePath: string, // Path to the CSV file
-  imageDirectory: string, // Path to the image directory
-  processRow: (row: any, imageDirectory: string) => any // Function to process each row
-) => {
+  model: any,
+  csvFilePath: string,
+  imageDirectory: string,
+  processRow: (row: any, imageDirectory: string) => Promise<any>
+): Promise<void> => {
   console.log(`📂 Seeding from ${csvFilePath}...`);
 
-  const data: any[] = [];
+  const rows: any[] = [];
 
-  fs.createReadStream(csvFilePath)
-    .pipe(csv())
-    .on('data', async (row) => {
-      const processedRow = await processRow(row, imageDirectory);
-      if (processedRow) {
-        data.push(processedRow);
-      }
-    })
-    .on('end', async () => {
-      // Insert the data in bulk in batches of 100 (or adjust chunk size as needed)
-      const chunkSize = 100;
-      for (let i = 0; i < data.length; i += chunkSize) {
-        const chunk = data.slice(i, i + chunkSize);
-        await model.createMany({
-          data: chunk,
-        });
-      }
-      console.log(`✅ Seeding complete for ${csvFilePath}`);
-    })
-    .on('error', (error) => {
-      console.error('Error reading CSV file:', error);
+  // Step 1: Load CSV rows
+  await new Promise<void>((resolve, reject) => {
+    fs.createReadStream(csvFilePath)
+      .pipe(csv())
+      .on('data', (row) => {
+        rows.push(row);
+      })
+      .on('end', () => resolve())
+      .on('error', (err) => reject(err));
+  });
+
+  // Step 2: Process rows in parallel (wait for all async hashes, etc.)
+  const processedData = await Promise.all(
+    rows.map(row => processRow(row, imageDirectory))
+  );
+
+  const validData = processedData.filter(Boolean); // remove undefined/null
+
+  // Step 3: Insert in batches
+  const chunkSize = 100;
+  for (let i = 0; i < validData.length; i += chunkSize) {
+    const chunk = validData.slice(i, i + chunkSize);
+    await model.createMany({
+      data: chunk,
+      skipDuplicates: true,
     });
+  }
+
+  console.log(`✅ Seeding complete for ${csvFilePath}`);
 };
+
