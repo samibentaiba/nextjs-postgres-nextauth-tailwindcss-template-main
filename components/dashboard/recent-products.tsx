@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { ArrowUpDown, MoreHorizontal, Plus } from 'lucide-react';
+import ClientTime from './client-time';
 
 import { Button } from '@/components/dashboard-ui/button';
 import {
@@ -156,14 +157,10 @@ export function RecentProducts() {
                     <TableCell>
                       ${parseFloat(product.price).toFixed(2)}
                     </TableCell>
+
                     <TableCell>{product.stock}</TableCell>
                     <TableCell>
-                      {formatDistanceToNow(
-                        new Date(product.availableAt as string),
-                        {
-                          addSuffix: true
-                        }
-                      )}
+                      <ClientTime date={product.availableAt} />
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>

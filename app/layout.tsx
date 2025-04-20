@@ -1,16 +1,24 @@
-'use client'
+"use client"
+import type React from "react"
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import "./globals.css"
+import { ThemeProvider } from "@/components/theme-provider"
 
-import './globals.css';
-import { ReactNode } from 'react';
-import ThemeWrapper from './ThemeWrapper';
+const inter = Inter({ subsets: ["latin"] })
 
-
-export default function RootLayout({ children }: { children: ReactNode }) {
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body  cz-shortcut-listen="true">
-        <ThemeWrapper>{children}</ThemeWrapper>
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className} cz-shortcut-listen="true">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
