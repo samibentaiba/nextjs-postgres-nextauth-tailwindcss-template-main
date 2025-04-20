@@ -30,8 +30,8 @@ model Image {
   uploadedAt    DateTime       @default(now())
   productImages ProductImage[] // Multiple ProductImage references
   blogImages    BlogImage[] // Multiple BlogImage references
-  Blog          Blog[]
 }
+
 
 model ProductImage {
   id        Int      @id @default(autoincrement())
@@ -67,8 +67,6 @@ model Blog {
   content     String
   status      Status      @default(active)
   publishedAt DateTime    @default(now())
-  imageId     Int         @unique // Primary image for the blog
-  image       Image       @relation(fields: [imageId], references: [id])
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   blogImages  BlogImage[] // One-to-many relation to BlogImage

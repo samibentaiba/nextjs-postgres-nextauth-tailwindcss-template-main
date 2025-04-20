@@ -1,4 +1,8 @@
 export default {
+  experimental: {
+    serverActions: false, // disables RSC features
+  },
+  reactStrictMode: false,
   images: {
     remotePatterns: [
       {

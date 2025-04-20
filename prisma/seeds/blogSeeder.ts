@@ -8,52 +8,63 @@ const prisma = new PrismaClient();
 async function blogSeeder(prisma: PrismaClient) {
   console.log('📝 Seeding blogs...');
 
-  const csvFilePath = path.resolve('data/blogs.csv');
-  const imageDirectory = path.resolve('public/images/blogs');
-
+  const csvPath = path.resolve('data/blogs.csv');
+  const imageDir = path.resolve('public/images/blogs');
   const rows: any[] = [];
 
-  // Step 1: Load all CSV rows
   await new Promise<void>((resolve, reject) => {
-    fs.createReadStream(csvFilePath)
+    fs.createReadStream(csvPath)
       .pipe(csvParser())
       .on('data', (row) => rows.push(row))
-      .on('end', () => resolve())
-      .on('error', (err) => reject(err));
+      .on('end', resolve)
+      .on('error', reject);
   });
 
-  // Step 2: Process each row
   for (const row of rows) {
-    const { title, content, image } = row;
-    const imagePath = path.join(imageDirectory, image);
+    const { title, content, images } = row;
 
-    if (!fs.existsSync(imagePath)) {
-      console.warn(`⚠️ Image "${image}" not found. Skipping blog "${title}".`);
-      continue;
-    }
-
-    const imageBuffer = fs.readFileSync(imagePath);
-
-    // 2a: Create Image record
-    const imageRecord = await prisma.image.create({
-      data: {
-        name: image,
-        data: imageBuffer,
-        folder: 'blogImages',
-      },
-    });
-
-    // 2b: Create Blog record and link the image
-    await prisma.blog.create({
+    const blog = await prisma.blog.create({
       data: {
         title,
         content,
-        imageId: imageRecord.id,
         status: 'active',
       },
     });
 
-    console.log(`✅ Blog "${title}" seeded with image "${image}"`);
+    if (!images) {
+      console.warn(`⚠️ No images for blog "${title}". Skipping images.`);
+      continue;
+    }
+
+    const imageList = images.split(',').map((i: string) => i.trim());
+
+    for (const imageName of imageList) {
+      const imagePath = path.join(imageDir, imageName);
+
+      if (!fs.existsSync(imagePath)) {
+        console.warn(`⚠️ Image "${imageName}" not found. Skipping.`);
+        continue;
+      }
+
+      const imageBuffer = fs.readFileSync(imagePath);
+
+      const imageRecord = await prisma.image.create({
+        data: {
+          name: imageName,
+          data: imageBuffer,
+          folder: 'blogImages',
+        },
+      });
+
+      await prisma.blogImage.create({
+        data: {
+          blogId: blog.id,
+          imageId: imageRecord.id,
+        },
+      });
+
+      console.log(`✅ Linked "${imageName}" to blog "${title}"`);
+    }
   }
 
   console.log('✅ Finished seeding blogs.');

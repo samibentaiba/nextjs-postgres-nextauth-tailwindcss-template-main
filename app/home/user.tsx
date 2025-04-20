@@ -1,6 +1,8 @@
+// components/user-client.tsx (Client Component)
+'use client';
+
+import { signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
-import { auth, signOut } from '@/lib/auth';
-import Image from 'next/image';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,12 +11,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import Image from 'next/image';
 import Link from 'next/link';
 
-export async function User() {
-  let session = await auth();
-  let user = session?.user;
-
+export function UserClient({ user }: { user?: { name?: string; image?: string } }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -39,15 +39,8 @@ export async function User() {
         <DropdownMenuItem>Support</DropdownMenuItem>
         <DropdownMenuSeparator />
         {user ? (
-          <DropdownMenuItem>
-            <form
-              action={async () => {
-                'use server';
-                await signOut();
-              }}
-            >
-              <button type="submit">Sign Out</button>
-            </form>
+          <DropdownMenuItem onClick={() => signOut()}>
+            Sign Out
           </DropdownMenuItem>
         ) : (
           <DropdownMenuItem>

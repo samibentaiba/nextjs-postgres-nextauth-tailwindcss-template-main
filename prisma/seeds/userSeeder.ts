@@ -1,4 +1,5 @@
-import { hashPassword , seedFromCsv } from '@/lib/utils'; // Import hashPassword utility
+import { hashPassword } from '@/lib/utils'; // Import hashPassword utility
+import { seedFromCsv } from 'utils/server';
 import { PrismaClient } from '@prisma/client';
 import path from 'path';
 
@@ -20,7 +21,7 @@ async function userSeeder(prisma: PrismaClient) {
       email,
       name,
       username,
-      password: hashedPassword, // Store the hashed password
+      password: hashedPassword // Store the hashed password
     };
   };
 
