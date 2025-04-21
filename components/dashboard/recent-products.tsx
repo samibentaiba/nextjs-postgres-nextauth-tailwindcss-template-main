@@ -3,24 +3,19 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
-import { ArrowUpDown, MoreHorizontal, Plus } from 'lucide-react';
+import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
 import ClientTime from './client-time';
+import { ScrollArea } from '../ui/scroll-area';
 
-import { Button } from '@/components/dashboard-ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from '@/components/dashboard-ui/card';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger
-} from '@/components/dashboard-ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 import {
   Table,
   TableBody,
@@ -28,8 +23,8 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from '@/components/dashboard-ui/table';
-import { Badge } from '@/components/dashboard-ui/badge';
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 
 interface Product {
   id: number;
@@ -37,7 +32,7 @@ interface Product {
   status: 'active' | 'inactive' | 'archived';
   price: string;
   stock: number;
-  availableAt: string; // <-- was Date, now explicitly a string
+  availableAt: string;
 }
 
 export function RecentProducts() {
@@ -73,7 +68,6 @@ export function RecentProducts() {
 
       if (!response.ok) throw new Error('Failed to delete product');
 
-      // Remove the deleted product from the state
       setProducts(products.filter((product) => product.id !== id));
     } catch (error) {
       console.error('Error deleting product:', error);
@@ -82,115 +76,115 @@ export function RecentProducts() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>Products</CardTitle>
-          <CardDescription>
-            Manage your products inventory and details.
-          </CardDescription>
-        </div>
-        <Button asChild>
-          <Link href="/dashboard/products/new">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Product
-          </Link>
-        </Button>
-      </CardHeader>
-      <CardContent>
+      <CardContent className=' '>
         {loading ? (
           <div className="flex justify-center py-8">Loading products...</div>
         ) : error ? (
           <div className="flex justify-center py-8 text-red-500">{error}</div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>
-                  <div className="flex items-center space-x-1">
-                    <span>Status</span>
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
-                </TableHead>
-                <TableHead>
-                  <div className="flex items-center space-x-1">
-                    <span>Price</span>
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
-                </TableHead>
-                <TableHead>
-                  <div className="flex items-center space-x-1">
-                    <span>Stock</span>
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
-                </TableHead>
-                <TableHead>Available</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {products.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center">
-                    No products found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                products.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell className="font-medium">
-                      {product.name}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          product.status === 'active'
-                            ? 'default'
-                            : product.status === 'inactive'
-                              ? 'secondary'
-                              : 'destructive'
-                        }
-                      >
-                        {product.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      ${parseFloat(product.price).toFixed(2)}
-                    </TableCell>
-
-                    <TableCell>{product.stock}</TableCell>
-                    <TableCell>
-                      <ClientTime date={product.availableAt} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem asChild>
-                            <Link href={`/dashboard/products/${product.id}`}>
-                              Edit
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-destructive focus:text-destructive"
-                            onClick={() => deleteProduct(product.id)}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+          <div className="relative ">
+            {/* Sticky header */}
+            <div className="flex flex-col justify-center items-center  ">
+              <Table className="bg-transparent">
+                <TableHeader className="sticky top-0 z-10 shadow-sm">
+                  <TableRow className="">
+                    <TableHead  className="p-0  w-[23%]">
+                      <span>Name</span>
+                    </TableHead>
+                    <TableHead className='p-0 w-[17%]'>
+                      <div className="flex items-center space-x-1">
+                        <span>Status</span>
+                        <ArrowUpDown className="h-4 w-4" />
+                      </div>
+                    </TableHead>
+                    <TableHead className='p-0 w-[14%]'>
+                      <div className="flex items-center space-x-1">
+                        <span>Price</span>
+                        <ArrowUpDown className="h-4 w-4" />
+                      </div>
+                    </TableHead>
+                    <TableHead className='p-0  w-[10%]'>
+                      <div className="flex items-center space-x-1">
+                        <span>Stock</span>
+                        <ArrowUpDown className="h-4 w-4" />
+                      </div>
+                    </TableHead>
+                    <TableHead className='p-0 w-[1%]'>Available</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                </TableHeader>
+              </Table>
+              </div>
+
+            {/* Scrollable body */}
+            <ScrollArea className="h-[30rem]">
+              <Table>
+                <TableBody>
+                  {products.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center">
+                        No products found
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    products.map((product) => (
+                      <TableRow key={product.id}>
+                        <TableCell className="font-medium">
+                          {product.name}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              product.status === 'active'
+                                ? 'default'
+                                : product.status === 'inactive'
+                                  ? 'secondary'
+                                  : 'destructive'
+                            }
+                          >
+                            {product.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          ${parseFloat(product.price).toFixed(2)}
+                        </TableCell>
+                        <TableCell>{product.stock}</TableCell>
+                        <TableCell>
+                          <ClientTime date={product.availableAt} />
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuItem asChild>
+                                <Link
+                                  href={`/dashboard/products/${product.id}`}
+                                >
+                                  Edit
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="text-destructive focus:text-destructive"
+                                onClick={() => deleteProduct(product.id)}
+                              >
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </ScrollArea>
+          </div>
         )}
       </CardContent>
     </Card>

@@ -19,8 +19,9 @@
     "paths": {
       "@/components/*": ["components/*"],
       "@/lib/*": ["lib/*"],
-      "@/data/*": ["data/*"]
-      ,"@/hooks/*": ["hooks/*"]
+      "@/data/*": ["data/*"],
+      "@/hooks/*": ["hooks/*"],
+      "@/context/*": ["context/*"]
     },
     "plugins": [
       {

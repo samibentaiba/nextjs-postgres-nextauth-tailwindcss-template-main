@@ -1,10 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DashboardHeader } from "@/components/dashboard/dashboard-header"
-import { DashboardShell } from "@/components/dashboard/dashboard-shell"
-import { RecentProducts } from "@/components/dashboard/recent-products"
-import { RecentBlogs } from "@/components/dashboard/recent-blogs"
-import { Overview } from "@/components/dashboard/overview"
+import { Tabs, TabsContent} from "@/components/ui/tabs"
+import { DashboardHeader } from "@/components/dashboard/main/dashboard-header"
+import { DashboardShell } from "@/components/dashboard/main/dashboard-shell"
+import { Overview } from "@/components/dashboard/main/overview"
 
 export default function DashboardPage() {
   return (
@@ -100,19 +98,8 @@ export default function DashboardPage() {
         </Card>
       </div>
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="products">Products</TabsTrigger>
-          <TabsTrigger value="blogs">Blogs</TabsTrigger>
-        </TabsList>
         <TabsContent value="overview" className="space-y-4">
           <Overview />
-        </TabsContent>
-        <TabsContent value="products" className="space-y-4">
-          <RecentProducts />
-        </TabsContent>
-        <TabsContent value="blogs" className="space-y-4">
-          <RecentBlogs />
         </TabsContent>
       </Tabs>
     </DashboardShell>

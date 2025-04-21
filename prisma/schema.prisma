@@ -7,19 +7,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  name     String?
-  username String  @unique
-  password String
-}
-
 enum Status {
   active
   inactive
   archived
+}
+
+enum Theme {
+  light
+  dark
+  system
 }
 
 model Image {
@@ -27,11 +24,10 @@ model Image {
   name          String
   data          Bytes
   folder        String // e.g., 'productImages', 'blogImages'
-  uploadedAt    DateTime       @default(now())
-  productImages ProductImage[] // Multiple ProductImage references
   blogImages    BlogImage[] // Multiple BlogImage references
+  productImages ProductImage[] // Multiple ProductImage references
+  uploadedAt    DateTime       @default(now())
 }
-
 
 model ProductImage {
   id        Int      @id @default(autoincrement())
@@ -46,19 +42,19 @@ model BlogImage {
   id        Int      @id @default(autoincrement())
   blogId    Int
   imageId   Int
-  image     Image    @relation(fields: [imageId], references: [id])
   blog      Blog     @relation(fields: [blogId], references: [id])
+  image     Image    @relation(fields: [imageId], references: [id])
   createdAt DateTime @default(now()) // When the image was added to the blog
 }
 
 model Product {
   id          Int            @id @default(autoincrement())
   name        String
-  status      Status
   price       Decimal        @db.Decimal(10, 2)
   stock       Int
-  availableAt DateTime
+  status      Status
   images      ProductImage[] // One-to-many relation to ProductImage
+  availableAt DateTime
 }
 
 model Blog {
@@ -66,9 +62,36 @@ model Blog {
   title       String
   content     String
   status      Status      @default(active)
-  publishedAt DateTime    @default(now())
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
   blogImages  BlogImage[] // One-to-many relation to BlogImage
+  publishedAt DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime    @default(now())
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  name     String?
+  username String  @unique
+  password String
+  theme    Theme   @default(system)
+  passwordResetTokens PasswordResetToken[]
+}
+
+model ForgotPasswordRequest {
+  id        Int      @id @default(autoincrement())
+  email     String
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  token     String   @unique  // Store hashed token here
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token]) // Optional: for optimization purposes, though hashed tokens are not commonly queried directly
 }
 

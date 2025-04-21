@@ -9,14 +9,14 @@ import { CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/dashboard-ui/button"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/dashboard-ui/form"
-import { Input } from "@/components/dashboard-ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/dashboard-ui/select"
+import { Button } from "@/components/ui/button"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "@/hooks/use-toast"
-import { Calendar } from "@/components/dashboard-ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/dashboard-ui/popover"
-import { Card, CardContent, CardFooter } from "@/components/dashboard-ui/card"
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 
 const productFormSchema = z.object({
   name: z.string().min(2, {

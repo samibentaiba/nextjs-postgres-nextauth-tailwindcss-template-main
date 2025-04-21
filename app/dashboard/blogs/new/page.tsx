@@ -1,5 +1,5 @@
-import { DashboardHeader } from "@/components/dashboard/dashboard-header"
-import { DashboardShell } from "@/components/dashboard/dashboard-shell"
+import { DashboardHeader } from "@/components/dashboard/main/dashboard-header"
+import { DashboardShell } from "@/components/dashboard/main/dashboard-shell"
 import { BlogForm } from "@/components/dashboard/blog-form"
 
 export default function NewBlogPage() {
